@@ -1,0 +1,13 @@
+{
+  "database": "C:/CoIoED/data/coioed.sqlite",
+  "attachments": "C:/CoIoED/data/uploads",
+  "primary_backup_dir": "D:/CoIoED_Backups",
+  "secondary_backup_dir": "E:/CoIoED_Offline_Replica",
+  "key_file": "C:/CoIoED_Secrets/backup.key",
+  "state_dir": "C:/CoIoED/backup_state",
+  "max_backup_age_minutes": 45,
+  "keep_snapshots": 96,
+  "keep_nightly": 30,
+  "keep_weekly": 12,
+  "keep_preupdate": 20
+}
