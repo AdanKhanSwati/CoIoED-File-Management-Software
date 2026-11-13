@@ -42,3 +42,9 @@ For backup tests, see `modules/backup_recovery/README.md`.
 The uploaded source does **not** include `data/coioed.db`, `data/private_original_master.xlsx`, `private_data.coioed`, encryption/decryption secrets, or `uploads/`. Therefore the preloaded Windows launcher cannot be used to recreate the confidential dataset from this repository alone.
 
 Do not disable launch security safeguards to make the public repository run against sensitive case records. Test with synthetic records only, and obtain formal IT/security approval before production deployment. Backup filesystem attachments are not transactionally coordinated with SQLite yet, so live backup integration needs a write-quiescing mechanism or immutable attachment handling.
+
+## Windows hearing-schedule update (v13.4)
+
+The installable, database-preserving update is under [`installer/hearing_update/`](installer/hearing_update/). It updates an **existing authorized Windows installation**; it is not a complete fresh installer. Extract the updater folder outside the original application folder, close CoIoED, and double-click `INSTALL_HEARING_UPDATE.bat`. The installer keeps backups of original Python files and runs synthetic integration checks; use `ROLLBACK_HEARING_UPDATE.bat` to revert source files. Do not copy confidential databases to GitHub.
+
+Features: moving draft hearing days between notices with optional rescheduling, date-range labels, per-day print PDF link, and independent name/parentage subrows for each clubbed missing person (2–3 cases). Test in an isolated setup before official use. This is not a certified production release.
