@@ -1,0 +1,36 @@
+# Secrets and runtime settings
+.env
+.env.*
+!.env.example
+*secret*
+*.key
+*.pem
+*.p12
+*.pfx
+backup_config.json
+# Database and journals
+*.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+*.db-journal
+# Case materials, backups, user uploads
+backups/
+backup/
+attachments/
+uploads/
+case_records/
+records/
+data/
+*.bak
+*.enc
+# Python caches
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.venv/
+venv/
+# Workstation artifacts
+.DS_Store
+Thumbs.db
