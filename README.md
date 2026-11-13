@@ -1,11 +1,44 @@
-# CoIoED Offline Case Management — Integration Modules
+# CoIoED Offline Case Management System
 
-**This repository currently contains integration prototypes, not the complete case-management application.**
+**Source-code repository — controlled evaluation build, not production-certified.**
 
-Available code:
-- `modules/backup_recovery/` — SQLite snapshot backup, encryption, restore validation, scheduler example, tests.
-- `modules/hearing_notice/` — hearing date-range labels, moving hearing days between notices, sample day-print view, tests.
+This repository contains the CoIoED offline Python/SQLite application source extracted from the confidential preloaded Windows installer, plus independent backup/recovery utilities and test modules. The **real database, source register workbook, encrypted private-data installer payload, user attachments, encryption keys, credentials, and historic backups are intentionally excluded**.
 
-**Security:** This repository is public. Do not commit real case files, missing-person details, HR records, databases, credentials, encryption keys, or backups. These modules are not approved for handling live records, and have not been integrated into the unavailable main application. Obtain Commission IT/security authorization and move to an approved private repository before adding sensitive internal code.
+> **Security warning:** This repository is currently PUBLIC. No confidential case data should ever be committed. Obtain Commission authorization and migrate the source to an approved PRIVATE repository before any official operational use. The application is not cleared for handling live confidential records on an unapproved LAN.
 
-See module-specific READMEs for limitations and test instructions.
+## Layout
+
+- `application/app.py` — main Python application server.
+- `application/hearing_v2.py` — actual hearing notice builder (integrated changes described below).
+- `application/notice_export.py` — established official hearing PDF/Excel renderer.
+- `application/hearing_workflow_v121.py` — notice review and approval workflow.
+- `application/operations_v09.py`, `procurement.py`, `employee_access.py`, `dashboard_analytics.py`, `register_exports.py` and other `application/` modules — core functionality.
+- `application/assets/` — app interface stylesheets and Commission logo.
+- `application/*.bat` — local Windows pilot launcher and setup scripts.
+- `modules/backup_recovery/` — encrypted snapshot and staged restore CLI, with Windows scheduled-task sample and tests. **This utility is not yet wired into the application lifecycle or dashboard.**
+- `modules/hearing_notice/` — earlier standalone hearing notice prototype; **the active implementation now lives in `application/hearing_v2.py`**.
+
+## Hearing schedule improvements (integrated in application source)
+
+- Notice labels show the earliest and latest hearing dates, e.g. **11th November 2026 to 13th November 2026**, instead of `Notice #1`; numeric notice IDs remain stable internally.
+- Editors may **move an entire hearing day** between editable draft notices, optionally changing its scheduled date, while retaining case snapshots, officer assignments, special instructions, combined case groups, and audit history.
+- Transfers are transactional, reject a conflicting hearing date in the destination, and cannot modify locked/approved notices.
+- Every hearing day displays **Print Day**, which opens the existing one-day official PDF renderer in a new browser tab; the separate PDF download remains available.
+
+## Verification
+
+For the hearing-day integration test, from inside `application/` run:
+
+```sh
+python test_notice_move_integration.py
+```
+
+This synthetic integration test checks date labels, moving/rescheduling a day, preserving case and group links, audit logging, and rejecting duplicate or approved destinations. A full user acceptance test against an authorized *synthetic* database and Windows browser is still required.
+
+For backup tests, see `modules/backup_recovery/README.md`.
+
+## Operational restrictions
+
+The uploaded source does **not** include `data/coioed.db`, `data/private_original_master.xlsx`, `private_data.coioed`, encryption/decryption secrets, or `uploads/`. Therefore the preloaded Windows launcher cannot be used to recreate the confidential dataset from this repository alone.
+
+Do not disable launch security safeguards to make the public repository run against sensitive case records. Test with synthetic records only, and obtain formal IT/security approval before production deployment. Backup filesystem attachments are not transactionally coordinated with SQLite yet, so live backup integration needs a write-quiescing mechanism or immutable attachment handling.
