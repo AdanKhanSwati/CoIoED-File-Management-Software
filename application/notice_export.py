@@ -67,6 +67,20 @@ def cnic_display(snapshot):
     return 'CNIC: '+visual
 
 
+def name_parentage_display(snapshot):
+    """Each person in a clubbed row retains their own name AND parentage.
+
+    Print parentage below that person's name, never infer it from another
+    grouped case; missing fields are visibly marked for checking before issue.
+    """
+    name=str(snapshot.get('name') or '').strip() or '[Name to verify]'
+    parentage=str(snapshot.get('parentage') or '').strip() or '[Parentage to verify]'
+    result=name+'\n'+parentage
+    if snapshot.get('cnic'):
+        result+='\n'+cnic_display(snapshot)
+    return result
+
+
 def compact_attendees(values):
     """One numbered entry per non-empty officer, regardless of original slot count."""
     return [str(v).strip() for v in (values or []) if str(v or '').strip()]
@@ -100,8 +114,7 @@ def notice_data(notice,days):
                 members=[]
                 for member in cluster:
                     s=member['snapshot']
-                    name=' '.join(v for v in (fld(s,'name'),fld(s,'parentage')) if v).strip()
-                    if fld(s,'cnic'):name+='\n'+cnic_display(s)
+                    name=name_parentage_display(s)
                     members.append([fld(s,'case_no'),name,display_date(fld(s,'missing_date'))])
                 try:people=json.loads(group['attendees_json'] or '[]')
                 except (TypeError,ValueError):people=[]
