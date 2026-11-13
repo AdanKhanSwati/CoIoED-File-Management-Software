@@ -421,10 +421,19 @@ def edit_group(h,group_id):
         available=c.execute('SELECT id,snapshot_json FROM hearing_items_v2 WHERE day_id=? AND group_id IS NULL ORDER BY seq,id',(g['day_id'],)).fetchall()
     readonly=g['status']!='Draft' or g['review_stage'] not in ('Draft','Changes Requested','Submitted for Secretary Review') or not h.allowed('hearing.edit')
     names=[]
+    people_rows=[]
     for m in members:
-        snap=json.loads(m['snapshot_json']);names.append(e(snap.get('case_no',''))+' — '+e(snap.get('name','')))
+        snap=json.loads(m['snapshot_json'])
+        number=e(snap.get('case_no',''))
+        person=e(snap.get('name','') or '[Name to verify]')
+        parent=e(snap.get('parentage','') or '[Parentage to verify]')
+        names.append(number)
+        change=(f'<a class="btn secondary" href="/notice/item/{m["id"]}">Edit person</a>'
+                if not readonly else '')
+        people_rows.append((number,person,parent,change))
     heading=f'<h1>Combined hearing entry</h1><p class="sub">'+ ' &amp; '.join(names)+'</p>'
-    hint=('<p class="muted">These cases print under one S. #, with individual case IDs, names, CNICs and missing dates. Shared address, officers and instructions appear once. The original shared address was taken from the first selected case and remains editable.</p>')
+    hint=('<p class="muted">Each clubbed case has its OWN missing-person name and parentage, printed on its own sub-row under one serial number. Check or edit each person separately below; the shared complainant/address, officers and special instructions print once.</p>'
+          +a.table(['CoIoED No.','Missing person','Parentage','Actions'],people_rows))
     if readonly:
         body=f'<div class="panel"><h2>Shared complainant & address</h2><p>{e(g["shared_address"])}</p><h2>Officers to Attend</h2><p style="white-space:pre-wrap">{e(chr(10).join(json.loads(g["attendees_json"])))}</p><h2>Special Instructions</h2><p>{e(g["special_instructions"])}</p></div>'
     else:
